@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import Backdrop from "@/components/three/Backdrop";
 import Butterfly from "@/components/three/Butterfly";
+import type { LamellaeSpec } from "@/components/three/Lamellae";
 import NanoDive from "@/components/three/NanoDive";
 import Stage3D from "@/components/three/Stage3D";
 import { Notes, Plot, Range, Readouts, Seg, useRaf } from "@/components/ui";
@@ -89,6 +90,9 @@ export default function WingLab() {
   const R0 = useMemo(() => O.spectrum(stack, 0), [stack]);
   const R40 = useMemo(() => O.spectrum(stack, 40), [stack]);
   const c0 = O.color(R0), c40 = O.color(R40);
+  const pk0 = O.visiblePeak(R0);
+  const lamellae = useMemo<LamellaeSpec>(() => ({ dc: ez.dc, da: ez.da, N: p.N, fill: O.MEDIA[p.fill].label.toLowerCase(), nf: ez.nf, reflect: c0.lin, css: c0.css, peak: pk0.lambda, R: pk0.R }),
+    [ez.dc, ez.da, ez.nf, p.N, p.fill, c0.css, pk0.lambda, pk0.R]); // eslint-disable-line react-hooks/exhaustive-deps
   const light = useMemo(() => new THREE.Vector3(), []);
   const a = (az * Math.PI) / 180;
   light.set(Math.sin(a) * 4, 6, Math.cos(a) * 4);
@@ -121,7 +125,7 @@ export default function WingLab() {
               <CameraGlide flip={flip} />
             </Stage3D>
           ) : (
-            <NanoDive lut={lut} height="min(66vh, 620px)" initial={1} />
+            <NanoDive lut={lut} height="min(66vh, 620px)" initial={1} lamellae={lamellae} />
           )}
           </motion.div>
           </AnimatePresence>

@@ -8,7 +8,7 @@ import type { OrbitControls as OrbitImpl } from "three-stdlib";
 import { structuralMaterial } from "@/lib/scene/materials";
 import Backdrop from "./Backdrop";
 import Butterfly from "./Butterfly";
-import Label3D from "./Label3D";
+import Lamellae, { colourName, DEFAULT_LAMELLAE, lamellaeFit, type LamellaeSpec } from "./Lamellae";
 import Stage3D from "./Stage3D";
 
 export const LEVELS = [
@@ -112,105 +112,6 @@ function Ridges({ lut }: { lut: THREE.DataTexture }) {
   );
 }
 
-/* ---------- level 3: lamellae cross-section with photons ---------- */
-const NM = 0.01; // scene units per nm (1 unit = 100 nm)
-const DC = 75 * NM, DA = 110 * NM, PERIOD = DC + DA, SHELVES = 8;
-const TREES = [-8, 0, 8];
-const TOP = 15.5;
-const shelfY = (k: number, side: number) => TOP - k * PERIOD - (side > 0 ? PERIOD / 2 : 0);
-
-function Lamellae() {
-  const shelves = useRef<THREE.InstancedMesh>(null!);
-  const chitin = useMemo(() => new THREE.MeshPhysicalMaterial({
-    color: "#f0dcae", roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.15, sheen: 0.8, sheenColor: new THREE.Color("#fff3d6"),
-    emissive: new THREE.Color("#4a3414"), emissiveIntensity: 0.55, transmission: 0.35, thickness: 0.8, ior: 1.56, attenuationColor: new THREE.Color("#c98a3a"), attenuationDistance: 3,
-  }), []);
-  const shelfGeo = useMemo(() => new THREE.BoxGeometry(2.7, DC, 5, 1, 1, 1), []);
-  const count = TREES.length * SHELVES * 2;
-  useEffect(() => {
-    const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
-    let k = 0;
-    for (const tx of TREES) for (let s = 0; s < SHELVES; s++) for (const side of [-1, 1]) {
-      const len = 1 - s * 0.03;
-      e.set(0, 0, side * 0.06); q.setFromEuler(e);
-      m.compose(new THREE.Vector3(tx + side * (0.2 + 1.35 * len), shelfY(s, side), 0), q, new THREE.Vector3(len, 1, 1));
-      shelves.current.setMatrixAt(k++, m);
-    }
-    shelves.current.instanceMatrix.needsUpdate = true;
-  }, []);
-  return (
-    <group>
-      <directionalLight position={[-8, 30, 18]} intensity={2.2} color="#fff4e0" />
-      <pointLight position={[0, 4, 8]} intensity={40} distance={30} color="#6fb0ff" />
-      <instancedMesh ref={shelves} args={[shelfGeo, chitin, count]} />
-      {TREES.map((x) => <mesh key={x} material={chitin} position={[x, TOP / 2 - 1, 0]}><boxGeometry args={[0.4, TOP + 1.4, 5]} /></mesh>)}
-      <mesh position={[0, -1.6, 0]}><boxGeometry args={[34, 1.4, 7]} /><meshPhysicalMaterial color="#23140a" roughness={0.9} sheen={0.4} sheenColor="#5a3518" /></mesh>
-      <Photons />
-      <Label3D position={[3.2, TOP + 1.1, 2.6]} color="#f0d9a8">chitin shelf · 75 nm</Label3D>
-      <Label3D position={[-4.6, shelfY(1, -1) - DC / 2 - DA / 2, 2.6]}>air gap · 110 nm</Label3D>
-      <Label3D position={[8, -3.1, 3.6]} color="#ff9a5a">melanin absorbs the rest</Label3D>
-      <Label3D position={[-8, TOP + 5.6, 2]} color="#ffffff">white light in ↓</Label3D>
-      <Label3D position={[0.6, TOP + 6.6, 2]} color="#7fc4ff">↑ blue reflected</Label3D>
-    </group>
-  );
-}
-
-function Photons() {
-  const MAX = 420;
-  const mesh = useRef<THREE.InstancedMesh>(null!);
-  const st = useMemo(() => ({
-    x: new Float32Array(MAX), y: new Float32Array(MAX), z: new Float32Array(MAX), vx: new Float32Array(MAX), vy: new Float32Array(MAX),
-    kind: new Int8Array(MAX), loss: new Float32Array(MAX), next: new Int8Array(MAX), alive: new Uint8Array(MAX), life: new Float32Array(MAX), acc: 0,
-  }), []);
-  const geo = useMemo(() => new THREE.SphereGeometry(0.2, 12, 8), []);
-  const mat = useMemo(() => new THREE.MeshBasicMaterial({ toneMapped: false }), []);
-  const m = useMemo(() => new THREE.Matrix4(), []), c = useMemo(() => new THREE.Color(), []);
-  const spawn = (kind: number, x: number, y: number, z: number, vx: number, vy: number) => {
-    for (let i = 0; i < MAX; i++) if (!st.alive[i]) {
-      st.alive[i] = 1; st.kind[i] = kind; st.x[i] = x; st.y[i] = y; st.z[i] = z; st.vx[i] = vx; st.vy[i] = vy; st.loss[i] = 0; st.next[i] = 0; st.life[i] = 0;
-      return;
-    }
-  };
-  useEffect(() => { mesh.current.setColorAt(0, c.setRGB(1, 1, 1)); }, [c]);
-  useFrame((_s, dtRaw) => {
-    const dt = Math.min(dtRaw, 0.05);
-    st.acc += dt * 36;
-    while (st.acc > 1) {
-      st.acc -= 1;
-      const tx = TREES[Math.floor(Math.random() * TREES.length)], side = Math.random() < 0.5 ? -1 : 1;
-      spawn(0, tx + side * (0.4 + Math.random() * 2.3), TOP + 8, (Math.random() - 0.5) * 4, 0, -8);
-    }
-    let n = 0;
-    for (let i = 0; i < MAX; i++) {
-      if (!st.alive[i]) continue;
-      st.life[i] += dt;
-      const py = st.y[i];
-      st.x[i] += st.vx[i] * dt; st.y[i] += st.vy[i] * dt;
-      if (st.kind[i] === 0) {
-        // crossing the next shelf going down: some blue is reflected back up
-        const tree = TREES.reduce((a, b) => (Math.abs(b - st.x[i]) < Math.abs(a - st.x[i]) ? b : a));
-        const side = st.x[i] > tree ? 1 : -1;
-        while (st.next[i] < SHELVES && st.y[i] < shelfY(st.next[i], side) && py >= shelfY(st.next[i], side) - 0.5) {
-          if (Math.random() < 0.32) { spawn(1, st.x[i], shelfY(st.next[i], side) + 0.2, st.z[i], side * (0.6 + Math.random() * 1.2), 8.5); st.loss[i] += 0.16; }
-          st.next[i]++;
-        }
-        if (st.y[i] < -0.9) { st.alive[i] = 0; continue; }
-      } else if (st.y[i] > TOP + 10) { st.alive[i] = 0; continue; }
-      const L = Math.min(1, st.loss[i]);
-      if (st.kind[i] === 0) c.setRGB(2.6 + 0.4 * L, 2.6 - 1.2 * L, 2.6 - 2.3 * L);
-      else c.setRGB(0.25, 0.85, 3.4);
-      const fade = st.kind[i] === 0 && st.y[i] < 0.5 ? Math.max(0, (st.y[i] + 0.9) / 1.4) : 1;
-      c.multiplyScalar(fade);
-      m.makeScale(1, 2.6, 1).setPosition(st.x[i], st.y[i], st.z[i]);
-      mesh.current.setMatrixAt(n, m); mesh.current.setColorAt(n, c); n++;
-    }
-    mesh.current.count = n;
-    mesh.current.instanceMatrix.needsUpdate = true;
-    if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true;
-  });
-  return <instancedMesh ref={mesh} args={[geo, mat, MAX]} frustumCulled={false} />;
-}
-
 /* ---------- camera rig ---------- */
 const easeIn = (x: number) => x * x * x;
 const easeOut = (x: number) => 1 - Math.pow(1 - x, 3);
@@ -265,8 +166,8 @@ function Rig({ level, leaveKey, deeper }: { level: number; leaveKey: number; dee
   return null;
 }
 
-export default function NanoDive({ lut, height = "min(70vh, 620px)", initial = 0, onLevel, extraHud }: {
-  lut: THREE.DataTexture; height?: string; initial?: number; onLevel?: (i: number) => void; extraHud?: React.ReactNode;
+export default function NanoDive({ lut, height = "min(70vh, 620px)", initial = 0, onLevel, extraHud, lamellae = DEFAULT_LAMELLAE }: {
+  lut: THREE.DataTexture; height?: string; initial?: number; onLevel?: (i: number) => void; extraHud?: React.ReactNode; lamellae?: LamellaeSpec;
 }) {
   const [level, setLevel] = useState(initial);
   const [shown, setShown] = useState(initial);
@@ -292,6 +193,10 @@ export default function NanoDive({ lut, height = "min(70vh, 620px)", initial = 0
   }, [touring, level]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   const L = LEVELS[level];
+  const fit = lamellaeFit(lamellae.dc, lamellae.da, lamellae.N);
+  const scaleText = (i: number) => (i === 3 ? Math.round(100 / fit) + " nm" : LEVELS[i].scale);
+  const levelText = (i: number) => i !== 3 || lamellae === DEFAULT_LAMELLAE ? LEVELS[i].text
+    : `Cut a ridge and you find a 'Christmas tree' of ${lamellae.N} chitin shelves, ${Math.round(lamellae.dc)} nm thick with ${Math.round(lamellae.da)} nm of ${lamellae.fill ?? "air"} between. White light goes in. Only ${colourName(lamellae.peak)} around ${Math.round(lamellae.peak)} nm comes back out; the rest is absorbed by melanin underneath.`;
 
   return (
     <div className="dive">
@@ -303,7 +208,7 @@ export default function NanoDive({ lut, height = "min(70vh, 620px)", initial = 0
         overlay={<>
           <div className={"dive-fade" + (deeper ? "" : " up")} style={{ opacity: fade }} />
           <div className="hud dive-hud" key={"h" + shown} style={{ top: 14, left: 16 }}><b>{LEVELS[shown].name}</b> &middot; magnification {LEVELS[shown].mag}</div>
-          <div className="dive-scalebar hud" key={"s" + shown}><i /><span>{LEVELS[shown].scale}</span></div>
+          <div className="dive-scalebar hud" key={"s" + shown}><i /><span>{scaleText(shown)}</span></div>
           {extraHud}
         </>}
       >
@@ -311,7 +216,7 @@ export default function NanoDive({ lut, height = "min(70vh, 620px)", initial = 0
         <group visible={shown === 0}>{shown === 0 && <Butterfly lut={lut} speed={0.35} amp={0.45} light={new THREE.Vector3(-2, 6, 3.5)} rotation={[0.05, Math.PI * 0.9, 0]} />}</group>
         {shown === 1 && <ScaleField lut={lut} />}
         {shown === 2 && <Ridges lut={lut} />}
-        {shown === 3 && <Lamellae />}
+        {shown === 3 && <Lamellae spec={lamellae} />}
         {shown < 3 && <Sparkles count={60} scale={[12, 6, 12]} size={2} speed={0.2} opacity={0.5} color="#9fd2ff" />}
         <OrbitControls makeDefault enablePan={false} enableDamping autoRotate={shown < 3} autoRotateSpeed={0.35} maxPolarAngle={shown === 3 ? Math.PI * 0.62 : Math.PI * 0.49} />
         <Rig level={shown} leaveKey={leaveKey} deeper={deeper} />
@@ -329,7 +234,7 @@ export default function NanoDive({ lut, height = "min(70vh, 620px)", initial = 0
           {touring ? <><Pause size={14} /> Stop the dive</> : <><Play size={14} /> Play the dive</>}
         </button>
       </div>
-      <p className="dive-text" key={"t" + level}>{L.text}</p>
+      <p className="dive-text" key={"t" + level}>{levelText(level)}</p>
     </div>
   );
 }

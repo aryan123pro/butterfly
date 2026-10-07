@@ -61,6 +61,7 @@ export default function Home() {
         <div className="labs">
           <Link className="lab" href="/wing-lab"><Thumb kind="wing" /><div><span className="k">L1 &middot; 3D</span><h3>Wing Lab</h3><p>Fly a Morpho in 3D. Flood its scales with alcohol, change the shelf spacing, then dive 100,000&times; down to one lamella and watch photons sort themselves.</p></div></Link>
           <Link className="lab" href="/vapour-lab"><Thumb kind="vapour" /><div><span className="k">L2 &middot; sensor</span><h3>Vapour Lab</h3><p>Pipe DMMP, a nerve-agent simulant, over a wing. Read its spectral fingerprint, run PCA live, coat the wing and watch the selectivity vanish.</p></div></Link>
+          <Link className="lab" href="/structure-lab"><Thumb kind="design" /><div><span className="k">L3 &middot; 3D</span><h3>Structure Lab</h3><p>Run the physics backwards. Pick a wavelength or any colour and the chitin shelves rebuild themselves, nanometre by nanometre, to reflect it.</p></div></Link>
         </div>
       </section>
 

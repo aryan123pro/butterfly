@@ -10,7 +10,7 @@ The models were inspired by the reference site dna-and-ga-lab.vercel.app (code a
 
 - Repo: https://github.com/aryan123pro/butterfly (branch `main`)
 - Stack: Next.js 16 (App Router, Turbopack), React 19, TypeScript, three.js 0.186, @react-three/fiber 9, drei 10, @react-three/postprocessing 3, motion 14, lucide-react. No backend and no environment variables.
-- Run: `npm install`, then `npm run dev`. `npm run build` passes, and all 11 routes prerender as static pages.
+- Run: `npm install`, then `npm run dev`. `npm run build` passes, and all 12 routes prerender as static pages.
 
 ## Site map
 
@@ -21,6 +21,7 @@ The models were inspired by the reference site dna-and-ga-lab.vercel.app (code a
 | `/anti-counterfeit` | Ch2 (3 steps, models only): 3D specimen note, microscope, cost model | `components/ch2/*`, `components/three/Banknote.tsx` |
 | `/beyond` | Ch3 (2 steps): vapour rig with sourced figures, 3D MorphoTex weave | `components/ch3/*` |
 | `/wing-lab` | 3D butterfly with eased camera glides and colour morphs, plus the nano-dive | `app/wing-lab/WingLab.tsx` |
+| `/structure-lab` | Inverse design: pick a wavelength (quarter-wave rule, refined by TMM) or any colour (grid search + local refine in OKLab), and a 3D lamella close-up morphs to the stack that reflects it. Chitin + air (broad band) or chitin + resin n = 1.40 (narrow, pure) | `app/structure-lab/*`, `lib/inverse.ts` |
 | `/vapour-lab` | Vapour sensor rebuilt on Kittle 2017/2020 and Potyrailo 2007/2013: P/P0 control, polarity gradient, Al2O3 coat toggle, PCA | `app/vapour-lab/*` |
 | `/references` | Tabs (`#photos`, `#sources`, `#slides`, `#team`); photos are Wikimedia Commons files in `public/photos` | `app/references/References.tsx` |
 
@@ -46,6 +47,7 @@ The vapour model (`app/vapour-lab/model.ts`) is a **teaching model**. Its vapour
 
 - `Stage3D`: an R3F `Canvas` with a procedural Lightformer environment (no downloads), Bloom, Vignette and Neutral tone mapping. It renders `flat`, and pauses when off-screen.
 - `materials.ts`: `STRUCT_GLSL` (the structural colour function), `structuralMaterial()` (supports instancing and `stripesU`/`stripesV`), `wingMaterial()` (bend, scale glitter, underside pigment texture), `lutTexture()`/`updateLut()`, wing geometry and masks.
+- `Lamellae` (`components/three/Lamellae.tsx`): the parameterised cross-section with photons, driven by a `LamellaeSpec` (dc, da, N, nf, reflected colour, peak, R). Used by the NanoDive's level 4 (Wing Lab passes its live stack) and by the Structure Lab. Tall stacks are squeezed vertically to fit (`lamellaeFit`); the scale bar and HUD say so.
 - `Butterfly` (props: `lut`, `flap`, `speed`, `amp`, `pigment`, `glint`, `gain`, `light`), `NanoDive` (4 levels: Wing, Scales, Ridges, Lamellae with photons), `Backdrop`, `Banknote`, `Label3D` (drei `Text` using the bundled `public/fonts/IBMPlexMono-Medium.ttf`).
 
 ## Hard-won gotchas (read before editing)

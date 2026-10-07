@@ -38,6 +38,14 @@ export default function Thumb({ kind, className }: { kind: string; className?: s
         s.forEach((v, i) => { const X = (i / s.length) * w, Y = h - 10 - v * (h - 20); if (i) g.lineTo(X, Y); else g.moveTo(X, Y); }); g.stroke();
       };
       line(O.spectrum(stack, 0), "#3fa9ff"); line(O.spectrum(O.morphoStack({ nf: 1.2 }), 0), "#39d98a");
+    } else if (kind === "design") {
+      // five stacks, each drawn to scale and tinted with the colour it reflects
+      const ls = [420, 470, 530, 590, 650], bw = w / ls.length;
+      ls.forEach((l, k) => {
+        const dc = l / 6.24, da = l / 4, col = O.color(O.spectrum(O.morphoStack({ dc, da, N: 6 }), 0)).css, sc = (h - 24) / 1100;
+        let y = 12;
+        for (let i = 0; i < 6; i++) { g.fillStyle = col; g.fillRect(k * bw + 8, y, bw - 16, Math.max(2, dc * sc)); y += (dc + da) * sc; }
+      });
     }
   }, [kind]);
   return <canvas ref={ref} className={className} aria-hidden="true" />;

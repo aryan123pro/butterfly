@@ -9,6 +9,7 @@ export const CHAPTERS: PageInfo[] = [
 export const LABS: PageInfo[] = [
   { id: "wing", href: "/wing-lab", k: "L1", title: "Wing Lab", sub: "Fly a 3D Morpho, then dive 100,000× into one scale" },
   { id: "vapour", href: "/vapour-lab", k: "L2", title: "Vapour Lab", sub: "Expose a Morpho didius wing to vapours and identify them with PCA" },
+  { id: "structure", href: "/structure-lab", k: "L3", title: "Structure Lab", sub: "Pick any colour and watch the shelves rebuild to reflect it" },
 ];
 
 export const REFS: PageInfo[] = [
@@ -29,6 +30,7 @@ export const STORY: StoryPage[] = [
   { href: "/beyond", k: "03", title: "Beyond the banknote", steps: ["Vapour sensor", "MorphoTex"] },
   { href: "/wing-lab", k: "L1", title: "Wing Lab", steps: ["Wing Lab"] },
   { href: "/vapour-lab", k: "L2", title: "Vapour Lab", steps: ["Vapour Lab"] },
+  { href: "/structure-lab", k: "L3", title: "Structure Lab", steps: ["Structure Lab"] },
   { href: "/references", k: "R", title: "References", steps: ["Photos & sources"] },
 ];
 export const STORY_MINUTES = 20;
