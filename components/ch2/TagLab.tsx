@@ -27,7 +27,7 @@ export default function TagLab() {
   return (
     <div className="stack" style={{ gap: 16 }}>
       <div className="split wide">
-        <Stage3D style={{ height: "min(62vh, 520px)" }} label="3D specimen banknote with a structural-colour security stripe" camera={{ position: [0, 0.6, 7.4], fov: 40 }} bloom={0.9} envIntensity={0.9}
+        <Stage3D style={{ height: "min(62svh, 520px)" }} label="3D specimen banknote with a structural-colour security stripe" camera={{ position: [0, 0.6, 7.4], fov: 40 }} bloom={0.9} envIntensity={0.9}
           overlay={<div className="hud" style={{ top: 12, left: 14 }}>note tilted <b>{tilt}&deg;</b> &middot; drag to look around</div>}>
           <Backdrop top="#10213a" halo="#294f86" haloDir={[0, 0.2, -1]} />
           <Banknote lutA={lutA} lutB={lutB} tilt={tilt} fx={fx} light={light} />

@@ -81,7 +81,7 @@ export default function Waves() {
   return (
     <div className="split">
       <div className="stack">
-        <div className="stage" style={{ height: "min(64vh, 540px)" }}>
+        <div className="stage" style={{ height: "min(64svh, 540px)" }}>
           <canvas ref={ref} className="cv" style={{ height: "100%" }} role="img" aria-label="Reflected waves from each shelf and their sum" />
         </div>
       </div>

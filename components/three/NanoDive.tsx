@@ -166,7 +166,7 @@ function Rig({ level, leaveKey, deeper }: { level: number; leaveKey: number; dee
   return null;
 }
 
-export default function NanoDive({ lut, height = "min(70vh, 620px)", initial = 0, onLevel, extraHud, lamellae = DEFAULT_LAMELLAE }: {
+export default function NanoDive({ lut, height = "min(70svh, 620px)", initial = 0, onLevel, extraHud, lamellae = DEFAULT_LAMELLAE }: {
   lut: THREE.DataTexture; height?: string; initial?: number; onLevel?: (i: number) => void; extraHud?: React.ReactNode; lamellae?: LamellaeSpec;
 }) {
   const [level, setLevel] = useState(initial);

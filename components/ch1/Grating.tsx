@@ -110,7 +110,7 @@ export default function Grating() {
 
   return (
     <div className="split">
-      <div className="stage" style={{ height: "min(64vh, 520px)" }}>
+      <div className="stage" style={{ height: "min(64svh, 520px)" }}>
         <canvas ref={ref} className="cv" style={{ height: "100%" }} role="img" aria-label="Diffraction fan from a ridged surface" />
       </div>
       <div className="stack">

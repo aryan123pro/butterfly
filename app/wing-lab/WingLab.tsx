@@ -113,7 +113,7 @@ export default function WingLab() {
             exit={{ opacity: 0, scale: view === "dive" ? 1.14 : 0.9, filter: "blur(14px)" }}
             transition={{ duration: 0.55, ease: [0.16, 0.84, 0.24, 1] }}>
           {view === "fly" ? (
-            <Stage3D style={{ height: "min(72vh, 680px)" }} label="Interactive 3D Blue Morpho" camera={{ position: [10, 7.5, 15], fov: 32 }} bloom={1.2}
+            <Stage3D style={{ height: "min(72svh, 680px)" }} label="Interactive 3D Blue Morpho" camera={{ position: [10, 7.5, 15], fov: 32 }} bloom={1.2}
               overlay={<>
                 <div className="hud" style={{ top: 14, left: 16 }}><b>{SPECIES.find((s) => JSON.stringify(s.p) === JSON.stringify(p))?.name ?? "Custom wing"}</b> &middot; {p.N} shelves &middot; {p.dc} nm chitin &middot; {p.da} nm {O.MEDIA[p.fill].label.toLowerCase()}</div>
                 <div className="hud" style={{ bottom: 14, left: 16 }}>{flip ? "Underside: brown melanin pigment and eyespots. No structural colour." : pigment > 0.5 ? "Pigment mode: same blue from every angle." : "Drag to orbit. Watch the colour slide as the wings flex."}</div>
@@ -125,7 +125,7 @@ export default function WingLab() {
               <CameraGlide flip={flip} />
             </Stage3D>
           ) : (
-            <NanoDive lut={lut} height="min(66vh, 620px)" initial={1} lamellae={lamellae} />
+            <NanoDive lut={lut} height="min(66svh, 620px)" initial={1} lamellae={lamellae} />
           )}
           </motion.div>
           </AnimatePresence>

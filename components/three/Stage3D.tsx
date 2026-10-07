@@ -33,7 +33,7 @@ export default function Stage3D({
         <Canvas
           frameloop={visible ? "always" : "never"}
           dpr={[1, 2]}
-          resize={{ offsetSize: true, scroll: false }} // ignore CSS transforms from page transitions
+          resize={{ offsetSize: true, scroll: false, debounce: { scroll: 0, resize: 150 } }} // ignore CSS transforms from page transitions
           flat
           camera={{ near: 0.01, far: 400, ...camera }}
           gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}

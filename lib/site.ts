@@ -31,7 +31,7 @@ export const STORY: StoryPage[] = [
   { href: "/wing-lab", k: "L1", title: "Wing Lab", steps: ["Wing Lab"] },
   { href: "/vapour-lab", k: "L2", title: "Vapour Lab", steps: ["Vapour Lab"] },
   { href: "/structure-lab", k: "L3", title: "Structure Lab", steps: ["Structure Lab"] },
-  { href: "/references", k: "R", title: "References", steps: ["Photos & sources"] },
+  { href: "/references", k: "R", title: "Meet the team", steps: ["Meet the team"] },
 ];
 export const STORY_MINUTES = 20;
 

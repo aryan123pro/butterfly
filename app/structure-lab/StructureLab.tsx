@@ -64,7 +64,7 @@ export default function StructureLab() {
     <main className="wrap" style={{ paddingBottom: 30 }}>
       <div className="lab-grid">
         <div className="stack" style={{ gap: 12 }}>
-          <Stage3D style={{ height: "min(72vh, 680px)" }} label="3D cross-section of the designed chitin stack" camera={{ position: [8, 11, 33], fov: 36 }} bloom={1.4}
+          <Stage3D style={{ height: "min(72svh, 680px)" }} label="3D cross-section of the designed chitin stack" camera={{ position: [8, 11, 33], fov: 36 }} bloom={1.4}
             overlay={<>
               <div className="hud" style={{ top: 14, left: 16 }}>
                 <b style={{ color: shown.colour.css }}>{mode === "wave" ? `Target ${lambda} nm` : `Target ${hex}`}</b> &middot; {N} shelves &middot; {Math.round(ez.dc)} nm chitin &middot; {Math.round(ez.da)} nm {M.gap}

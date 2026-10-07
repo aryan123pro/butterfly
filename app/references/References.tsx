@@ -2,6 +2,8 @@
 /* eslint-disable @next/next/no-img-element */
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import TeamSpecimens from "@/components/TeamSpecimens";
+import { store } from "@/lib/site";
 
 const TABS = [["photos", "Photos"], ["sources", "Sources"], ["slides", "Presentation"], ["team", "Team"]] as const;
 
@@ -47,7 +49,6 @@ const SOURCES: { group: string; items: { url: string; used: string }[] }[] = [
   ] },
 ];
 
-const TEAM = [["C106", "Sarthak Agarwal"], ["C122", "Saharsh B"], ["C123", "Sanidhya Bakliwal"], ["C129", "Bhavishya Bhaloria"]];
 const N_SLIDES = 38;
 
 export default function References() {
@@ -58,6 +59,8 @@ export default function References() {
     // Next's Link updates the hash with pushState, which fires no hashchange event, so poll lightly
     const read = () => { const h = location.hash.replace("#", "") as Tab; if (TABS.some(([k]) => k === h)) setTab(h); };
     read();
+    // the story ends here: open on the team, unless a tab was asked for
+    if (!location.hash && store<boolean>("story")) setTab("team");
     const id = setInterval(read, 300);
     return () => clearInterval(id);
   }, []);
@@ -124,10 +127,7 @@ export default function References() {
       )}
 
       {tab === "team" && (
-        <div className="stack" style={{ gap: 16 }}>
-          <div className="team">{TEAM.map(([r, n]) => <div key={r} className="member"><span className="roll">{r}</span><b>{n}</b></div>)}</div>
-          <p className="muted">Bio-inspired Security &amp; Anti-counterfeiting Technology. Built as an interactive companion to the presentation.</p>
-        </div>
+        <TeamSpecimens />
       )}
 
       {ph !== null && (
