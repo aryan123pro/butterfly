@@ -2,9 +2,11 @@
 import { Canvas } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import { Bloom, EffectComposer, ToneMapping, Vignette } from "@react-three/postprocessing";
+import { Expand } from "lucide-react";
 import { ToneMappingMode } from "postprocessing";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import * as THREE from "three";
+import { toggleFullscreen } from "../Shell";
 
 /* A 3D stage: pauses when scrolled away, studio lighting with no downloads, bloom so
    structural colour glows the way it does on a real wing. */
@@ -31,6 +33,7 @@ export default function Stage3D({
         <Canvas
           frameloop={visible ? "always" : "never"}
           dpr={[1, 2]}
+          resize={{ offsetSize: true, scroll: false }} // ignore CSS transforms from page transitions
           flat
           camera={{ near: 0.01, far: 400, ...camera }}
           gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
@@ -55,6 +58,7 @@ export default function Stage3D({
         </div>
       )}
       {overlay}
+      {ok && <button className="stage-fs" title="Full screen this model" aria-label="Full screen this model" onClick={() => toggleFullscreen(host.current)}><Expand size={15} /></button>}
     </div>
   );
 }

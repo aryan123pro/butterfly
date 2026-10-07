@@ -21,7 +21,8 @@ export function Steps({ id, children, next }: { id: string; children: ReactNode;
     const k = Math.max(0, Math.min(titles.length - 1, i));
     setActive(k);
     try { history.replaceState(null, "", "#step-" + (k + 1)); } catch { /* ignore */ }
-    if (scroll && barRef.current) {
+    if (scroll && document.body.classList.contains("story")) window.scrollTo({ top: 0, behavior: "smooth" });
+    else if (scroll && barRef.current) {
       const y = barRef.current.getBoundingClientRect().top + window.scrollY - 56;
       if (window.scrollY > y) window.scrollTo({ top: y, behavior: "smooth" });
     }
@@ -36,17 +37,9 @@ export function Steps({ id, children, next }: { id: string; children: ReactNode;
     setSeen((s) => { if (s.includes(active)) return s; const n = [...s, active]; store("seen." + id, n); return n; });
     tabRefs.current[active]?.scrollIntoView({ block: "nearest", inline: "center" });
   }, [active, id]);
-  useEffect(() => { setSteps({ titles, go }); return () => setSteps(null); }, [titles.join("|"), go]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    const key = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement;
-      if (/input|textarea|select/i.test(t.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
-      if (e.key === "ArrowRight" || e.key === "PageDown") { go(active + 1); e.preventDefault(); }
-      if (e.key === "ArrowLeft" || e.key === "PageUp") { go(active - 1); e.preventDefault(); }
-    };
-    window.addEventListener("keydown", key);
-    return () => window.removeEventListener("keydown", key);
-  }, [active, go]);
+  // arrow keys live in the Shell, which also carries story mode across pages
+  useEffect(() => { setSteps({ titles, go, active }); }, [titles.join("|"), go, active]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => setSteps(null), [setSteps]);
 
   const cur = items[active];
   return (

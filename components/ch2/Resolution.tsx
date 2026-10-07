@@ -104,16 +104,6 @@ export default function Resolution() {
         </figure>
       </div>
       <Range label="Microscope zoom (field of view)" value={z} min={0} max={1} step={0.005} onChange={setZ} fmt={() => fmt(fov)} />
-      <div className="tablewrap">
-        <table className="data">
-          <thead><tr><th>Metric</th><th>Biomimetic tag</th><th>Dye-based print</th></tr></thead>
-          <tbody>
-            <tr><td>Smallest feature</td><td className="win">100&ndash;300 nm</td><td className="lose">10,000&ndash;20,000 nm</td></tr>
-            <tr><td>Features per cm&sup2;</td><td className="win">~10&#8313;</td><td className="lose">~10&#8308;&ndash;10&#8309;</td></tr>
-            <tr><td>Copy with a scanner and printer?</td><td className="win">No: below the printer&apos;s smallest dot</td><td className="lose">Yes</td></tr>
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }

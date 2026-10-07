@@ -32,23 +32,12 @@ export default function Thumb({ kind, className }: { kind: string; className?: s
       g.fillStyle = grd; g.beginPath();
       g.ellipse(w * 0.32, h * 0.45, w * 0.26, h * 0.3, -0.5, 0, 6.3); g.ellipse(w * 0.68, h * 0.45, w * 0.26, h * 0.3, 0.5, 0, 6.3); g.fill();
       g.fillStyle = "#1c1712"; g.fillRect(w * 0.49, h * 0.2, w * 0.02, h * 0.6);
-    } else if (kind === "fake") {
-      const cw = (w - 25) / 4;
-      for (let c = 0; c < 4; c++) for (let y = 0; y < h - 20; y += 2) {
-        const a = c !== 2 ? 15 + (y / h) * 40 : 20;
-        g.fillStyle = O.color(O.spectrum(tagStack, a), 1.3).css; g.fillRect(5 + c * (cw + 5), 10 + y, cw, 2);
-      }
     } else if (kind === "vapour") {
       const line = (s: Float32Array, col: string) => {
         g.strokeStyle = col; g.lineWidth = 2; g.beginPath();
         s.forEach((v, i) => { const X = (i / s.length) * w, Y = h - 10 - v * (h - 20); if (i) g.lineTo(X, Y); else g.moveTo(X, Y); }); g.stroke();
       };
       line(O.spectrum(stack, 0), "#3fa9ff"); line(O.spectrum(O.morphoStack({ nf: 1.2 }), 0), "#39d98a");
-    } else if (kind === "forge") {
-      const px = 10, a1 = O.color(O.spectrum(O.morphoStack(), 0)).css, a2 = O.color(O.spectrum(O.morphoStack({ da: 140 }), 0)).css;
-      const pat = ["000000000000", "011101110110", "010001010101", "011001110101", "010001010110", "011101010101", "000000000000"];
-      const ox = (w - 12 * px) / 2, oy = (h - 7 * px) / 2;
-      pat.forEach((row, y) => { for (let x = 0; x < row.length; x++) { g.fillStyle = row[x] === "1" ? a2 : a1; g.fillRect(ox + x * px, oy + y * px, px - 1, px - 1); } });
     }
   }, [kind]);
   return <canvas ref={ref} className={className} aria-hidden="true" />;

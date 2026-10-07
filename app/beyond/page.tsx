@@ -9,17 +9,14 @@ export default function Page() {
     <>
       <PageHead
         eyebrow="Chapter 03 · More applications"
-        title={<>The same shelves, <span className="iri">four more jobs</span></>}
+        title={<>The same shelves, <span className="iri">two more jobs</span></>}
         stats={[
-          ["ppm", "nerve-agent simulants detected by a wing"],
-          ["2.9 mK", "temperature difference seen without cooling"],
-          ["61 layers", "of 70 nm polymer in MorphoTex fibre"],
-          ["0 W", "to hold a Mirasol image on screen"],
+          ["30 ppm", "DMMP picked out of a vapour mixture by a real wing"],
+          ["91.9%", "of the wing's spectral response in 3 principal components"],
+          ["61 layers", "of ~70 nm polymer in MorphoTex fibre"],
         ]}
       >
-        Anything that changes the spacing or the filling of the shelves changes the colour. Let vapour in and you have a gas sensor. Let heat
-        expand them and you have a thermal camera. Fix them in polymer and you have dye-free fabric. Move a mirror with a voltage and you have
-        a display.
+        Let vapour into the shelves and you have a gas sensor. Fix them in polymer and you have dye-free fabric.
       </PageHead>
       <Chapter3 />
     </>

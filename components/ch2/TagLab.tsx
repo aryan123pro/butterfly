@@ -1,6 +1,6 @@
 "use client";
 import { OrbitControls } from "@react-three/drei";
-import { ArrowRight, Copy, Layers, MoveVertical, Palette, Pause, Play } from "lucide-react";
+import { Copy, Layers, MoveVertical, Palette, Pause, Play } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { TAG_A, TAG_B } from "@/lib/designs";
@@ -10,13 +10,6 @@ import Backdrop from "../three/Backdrop";
 import Banknote, { type StripeFx } from "../three/Banknote";
 import Stage3D from "../three/Stage3D";
 import { Range, useRaf } from "../ui";
-
-const PIPE = [
-  { k: "Nanostructure", s: "Stacks of 120 nm and 200 nm films, patterned into pixels" },
-  { k: "Light interaction", s: "Each pixel reflects a different band, and the band moves with angle" },
-  { k: "Optical effect", s: "Colour shift, motion and apparent depth" },
-  { k: "Authentication", s: "Tilt the note. A printed copy stays frozen" },
-];
 
 export default function TagLab() {
   const [tilt, setTilt] = useState(18);
@@ -33,14 +26,6 @@ export default function TagLab() {
 
   return (
     <div className="stack" style={{ gap: 16 }}>
-      <div className="pipe">
-        {PIPE.map((p, i) => (
-          <div key={p.k} className="pipe-step">
-            <span className="n">{i + 1}</span><b>{p.k}</b><small>{p.s}</small>
-            {i < PIPE.length - 1 && <ArrowRight className="pipe-arrow" size={16} aria-hidden="true" />}
-          </div>
-        ))}
-      </div>
       <div className="split wide">
         <Stage3D style={{ height: "min(62vh, 520px)" }} label="3D specimen banknote with a structural-colour security stripe" camera={{ position: [0, 0.6, 7.4], fov: 40 }} bloom={0.9} envIntensity={0.9}
           overlay={<div className="hud" style={{ top: 12, left: 14 }}>note tilted <b>{tilt}&deg;</b> &middot; drag to look around</div>}>
@@ -70,11 +55,6 @@ export default function TagLab() {
             </div>
           </div>
           <button className={"btn" + (fx.printed ? " primary" : "")} onClick={() => toggle("printed")}><Copy size={15} /> {fx.printed ? "Back to the genuine stripe" : "Swap in a printed copy"}</button>
-          <p className="muted" style={{ fontSize: "var(--t-sm)" }}>
-            {fx.printed
-              ? "The copy was scanned at one angle. Tilt it: the colours, the motion and the depth are all frozen, because ink cannot change its reflected wavelength."
-              : "Two engineered stacks sit side by side. As you tilt, their reflected bands slide past each other, so the motif swaps from green-on-magenta to magenta-on-green."}
-          </p>
         </div>
       </div>
     </div>

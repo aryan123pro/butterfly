@@ -1,14 +1,13 @@
 import Link from "next/link";
 import HeroMorpho from "@/components/HeroMorpho";
+import StartStory from "@/components/StartStory";
 import Thumb from "@/components/Thumb";
 import "./home.css";
 
 const MACHINES = [
   ["/anti-counterfeit", "Security tag", "Your hand tilting it", "Path difference changes with angle", "Colour shift, motion, depth", "Human eye"],
   ["/vapour-lab", "Vapour sensor", "Gas condensing between lamellae", "Gap refractive index rises", "Spectral fingerprint ΔR", "Spectrometer + PCA"],
-  ["/beyond#step-2", "Thermal imager", "Infrared heating CNT-coated shelves", "Shelves expand, gaps shrink", "Colour shift for every 2.9 mK", "Visible camera"],
-  ["/beyond#step-3", "MorphoTex fibre", "Nothing: fixed at manufacture", "61 layers of 70 nm polymer", "Colour without dye", "Human eye"],
-  ["/beyond#step-4", "Mirasol display", "Voltage pulling a MEMS mirror", "Air gap set per pixel", "Red, green, blue or black", "Human eye, in sunlight"],
+  ["/beyond#step-2", "MorphoTex fibre", "Nothing: fixed at manufacture", "61 layers of 70 nm polymer", "Colour without dye", "Human eye"],
 ];
 
 export default function Home() {
@@ -24,9 +23,9 @@ export default function Home() {
             security features on modern banknotes.
           </p>
           <div className="cta">
-            <Link className="btn primary" href="/structural-colour">Start with chapter 1 &rarr;</Link>
-            <Link className="btn" href="/wing-lab">Open the Wing Lab</Link>
-            <Link className="btn ghost" href="/spot-the-fake">Play Spot the Fake</Link>
+            <StartStory />
+            <Link className="btn" href="/structural-colour">Chapter 1 &rarr;</Link>
+            <Link className="btn ghost" href="/wing-lab">Open the Wing Lab</Link>
           </div>
         </div>
         <HeroMorpho />
@@ -52,8 +51,8 @@ export default function Home() {
         </div>
         <div className="chapters">
           <Link className="chap" href="/structural-colour"><Thumb kind="stack" /><div className="body"><span className="k">CHAPTER 01</span><h3>Structural colour</h3><p>Zoom from wing to lamella, add reflected waves by hand, then tune a real multilayer and see the colour it makes.</p><div className="tags"><span className="chip">interference</span><span className="chip">iridescence</span><span className="chip">diffraction</span></div></div></Link>
-          <Link className="chap" href="/anti-counterfeit"><Thumb kind="tag" /><div className="body"><span className="k">CHAPTER 02</span><h3>Anti-counterfeiting</h3><p>Why holograms lose, how KolourOptik-style tags work, and a stress test: 1000 hours of UV and 500&nbsp;&deg;C against ordinary dye.</p><div className="tags"><span className="chip">security tags</span><span className="chip">resolution</span><span className="chip">cost</span></div></div></Link>
-          <Link className="chap" href="/beyond"><Thumb kind="beyond" /><div className="body"><span className="k">CHAPTER 03</span><h3>Beyond the banknote</h3><p>The same shelves sense nerve-agent simulants, see heat down to 2.9&nbsp;mK, colour fabric without dye and light a screen with no backlight.</p><div className="tags"><span className="chip">vapour</span><span className="chip">thermal IR</span><span className="chip">MorphoTex</span><span className="chip">Mirasol</span></div></div></Link>
+          <Link className="chap" href="/anti-counterfeit"><Thumb kind="tag" /><div className="body"><span className="k">CHAPTER 02</span><h3>Anti-counterfeiting</h3><p>A KolourOptik-style stripe you can tilt and forge, a microscope that out-resolves any printer, and what a tag costs.</p><div className="tags"><span className="chip">security tags</span><span className="chip">resolution</span><span className="chip">cost</span></div></div></Link>
+          <Link className="chap" href="/beyond"><Thumb kind="beyond" /><div className="body"><span className="k">CHAPTER 03</span><h3>Beyond the banknote</h3><p>A real Morpho wing that picks out a nerve-agent simulant at 30&nbsp;ppm in a mixture, and a fibre coloured with no dye.</p><div className="tags"><span className="chip">vapour</span><span className="chip">MorphoTex</span></div></div></Link>
         </div>
       </section>
 
@@ -61,15 +60,13 @@ export default function Home() {
         <div className="band-head"><div className="stack" style={{ gap: 8 }}><p className="eyebrow">Playgrounds &middot; open any time</p><h2>Hands on the physics</h2></div></div>
         <div className="labs">
           <Link className="lab" href="/wing-lab"><Thumb kind="wing" /><div><span className="k">L1 &middot; 3D</span><h3>Wing Lab</h3><p>Fly a Morpho in 3D. Flood its scales with alcohol, change the shelf spacing, then dive 100,000&times; down to one lamella and watch photons sort themselves.</p></div></Link>
-          <Link className="lab" href="/spot-the-fake"><Thumb kind="fake" /><div><span className="k">L2 &middot; game</span><h3>Spot the Fake</h3><p>Four specimens, one or two counterfeits. Tilt them, breathe on them, put them under the spectrometer. The class against the forgers.</p></div></Link>
-          <Link className="lab" href="/vapour-lab"><Thumb kind="vapour" /><div><span className="k">L3 &middot; sensor</span><h3>Vapour Lab</h3><p>Pipe DMMP, a nerve-agent simulant, over a wing. Read its spectral fingerprint, run PCA live and name a mystery vial.</p></div></Link>
-          <Link className="lab" href="/tag-forge"><Thumb kind="forge" /><div><span className="k">L4 &middot; design</span><h3>Tag Forge</h3><p>Paint a security tag in nanostructures, hide an image that only appears at one angle, then attack it with a counterfeiter&apos;s scanner and printer.</p></div></Link>
+          <Link className="lab" href="/vapour-lab"><Thumb kind="vapour" /><div><span className="k">L2 &middot; sensor</span><h3>Vapour Lab</h3><p>Pipe DMMP, a nerve-agent simulant, over a wing. Read its spectral fingerprint, run PCA live, coat the wing and watch the selectivity vanish.</p></div></Link>
         </div>
       </section>
 
       <section className="band wrap">
         <div className="band-head">
-          <div className="stack" style={{ gap: 8 }}><p className="eyebrow">One idea, five machines</p><h2>Nanostructure &rarr; light &rarr; signal</h2></div>
+          <div className="stack" style={{ gap: 8 }}><p className="eyebrow">One idea, three machines</p><h2>Nanostructure &rarr; light &rarr; signal</h2></div>
           <p className="lede">Every application in this lab is the same chain. What changes is the thing that disturbs the shelves and the thing that reads the colour.</p>
         </div>
         <div className="machine"><div className="wrapx"><div className="inner">

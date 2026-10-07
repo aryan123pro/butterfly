@@ -7,9 +7,7 @@ export const metadata: Metadata = { title: "Reference" };
 export default function Page() {
   return (
     <>
-      <PageHead eyebrow="Reference" title={<>Sources, slides <span className="iri">&amp; team</span></>}>
-        The research timeline, every paper behind the numbers on this site, the original presentation and the people who made it.
-      </PageHead>
+      <PageHead eyebrow="Reference" title={<>Photos, sources <span className="iri">&amp; team</span></>} />
       <References />
     </>
   );

@@ -212,34 +212,55 @@ function Photons() {
 }
 
 /* ---------- camera rig ---------- */
-function Rig({ level, push }: { level: number; push: number }) {
+const easeIn = (x: number) => x * x * x;
+const easeOut = (x: number) => 1 - Math.pow(1 - x, 3);
+type Glide = { from: THREE.Vector3; to: THREE.Vector3; t0: number; dur: number; ease: (x: number) => number; done?: () => void };
+
+/* Leaving a level: an accelerating dolly toward (or away from) the subject while the view darkens.
+   Arriving: the camera starts close in (or far out) and decelerates onto the pose, so the two halves
+   read as one continuous zoom. Time-based easing, so it looks the same at any frame rate. */
+function Rig({ level, leaveKey, deeper }: { level: number; leaveKey: number; deeper: boolean }) {
   const { camera, controls } = useThree() as unknown as { camera: THREE.PerspectiveCamera; controls: OrbitImpl | null };
-  const prev = useRef(-1);
+  const glide = useRef<Glide | null>(null);
+  const first = useRef(true);
   useEffect(() => {
     if (!controls) return;
     const p = POSES[level];
-    // start a little further in, then settle back: feels like arriving from the zoom
-    const target = new THREE.Vector3(...p.target);
-    const start = new THREE.Vector3(...p.pos).sub(target).multiplyScalar(prev.current < level ? 0.45 : 1.6).add(target);
+    const target = new THREE.Vector3(...p.target), goal = new THREE.Vector3(...p.pos);
+    const k = first.current ? 0.55 : deeper ? 0.3 : 2.1;
+    first.current = false;
+    const start = goal.clone().sub(target).multiplyScalar(k).add(target);
     camera.position.copy(start);
     controls.target.copy(target);
-    controls.minDistance = p.min; controls.maxDistance = p.max;
-    controls.update();
-    prev.current = level;
-  }, [level, controls, camera]);
-  useFrame((_s, dt) => {
+    // let the glide pass through distances the user is not allowed to orbit to
+    controls.minDistance = Math.min(p.min, start.distanceTo(target) * 0.9); controls.maxDistance = Math.max(p.max, start.distanceTo(target) * 1.1);
+    glide.current = { from: start, to: goal, t0: performance.now(), dur: 1.6, ease: easeOut, done: () => { controls.minDistance = p.min; controls.maxDistance = p.max; } };
+  }, [level, controls, camera]); // eslint-disable-line react-hooks/exhaustive-deps
+  const lastLeave = useRef(leaveKey);
+  useEffect(() => {
+    // once per click: an effect keyed on anything else can re-fire after the arrival and dive into the scene
+    if (leaveKey === lastLeave.current || !controls) return;
+    lastLeave.current = leaveKey;
+    const t = controls.target.clone();
+    const to = camera.position.clone().sub(t).multiplyScalar(deeper ? 0.3 : 2.2).add(t);
+    controls.minDistance = 0.01; controls.maxDistance = 1e3;
+    glide.current = { from: camera.position.clone(), to, t0: performance.now(), dur: 0.62, ease: easeIn };
+  }, [leaveKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    // a drag takes over from any glide in progress
     if (!controls) return;
-    const p = POSES[level];
-    const goal = new THREE.Vector3(...p.pos);
-    if (push > 0) {
-      // diving: rush toward the target
-      const t = new THREE.Vector3(...p.target);
-      camera.position.lerp(t, Math.min(1, dt * 3.5 * push));
-    } else if (camera.position.distanceTo(goal) > 0.05 && camera.userData.settle !== level) {
-      camera.position.lerp(goal, Math.min(1, dt * 1.6));
-      if (camera.position.distanceTo(goal) < 0.08) camera.userData.settle = level;
-    }
+    const stop = () => { const g = glide.current; if (g && g.ease === easeOut) { g.done?.(); glide.current = null; } };
+    controls.addEventListener("start", stop);
+    return () => controls.removeEventListener("start", stop);
+  }, [controls]);
+  useFrame(() => {
+    const g = glide.current;
+    if (!g || !controls) return;
+    // wall-clock progress: the move ends on time even when a heavy scene drops frames
+    const t = Math.min(1, (performance.now() - g.t0) / 1000 / g.dur);
+    camera.position.lerpVectors(g.from, g.to, g.ease(t));
     controls.update();
+    if (t >= 1) { g.done?.(); glide.current = null; }
   });
   return null;
 }
@@ -251,12 +272,18 @@ export default function NanoDive({ lut, height = "min(70vh, 620px)", initial = 0
   const [shown, setShown] = useState(initial);
   const [fade, setFade] = useState(0);
   const [touring, setTouring] = useState(false);
+  const [deeper, setDeeper] = useState(true);
+  const [leaveKey, setLeaveKey] = useState(0);
   const timers = useRef<number[]>([]);
   const go = (i: number) => {
     if (i === level) return;
     timers.current.forEach(clearTimeout);
-    setLevel(i); setFade(1);
-    timers.current = [window.setTimeout(() => { setShown(i); onLevel?.(i); setFade(0); }, 520)];
+    setDeeper(i > shown); setLevel(i); setFade(1); setLeaveKey((k) => k + 1);
+    // swap the scene while the view is dark, give it a frame to draw, then lift the veil
+    timers.current = [
+      window.setTimeout(() => { setShown(i); onLevel?.(i); }, 620),
+      window.setTimeout(() => setFade(0), 720),
+    ];
   };
   useEffect(() => {
     if (!touring) return;
@@ -274,9 +301,9 @@ export default function NanoDive({ lut, height = "min(70vh, 620px)", initial = 0
         camera={{ position: POSES[initial].pos, fov: 36 }}
         bloom={shown === 3 ? 1.5 : 1.1}
         overlay={<>
-          <div className="dive-fade" style={{ opacity: fade }} />
-          <div className="hud" style={{ top: 14, left: 16 }}><b>{L.name}</b> &middot; magnification {L.mag}</div>
-          <div className="dive-scalebar hud"><i /><span>{L.scale}</span></div>
+          <div className={"dive-fade" + (deeper ? "" : " up")} style={{ opacity: fade }} />
+          <div className="hud dive-hud" key={"h" + shown} style={{ top: 14, left: 16 }}><b>{LEVELS[shown].name}</b> &middot; magnification {LEVELS[shown].mag}</div>
+          <div className="dive-scalebar hud" key={"s" + shown}><i /><span>{LEVELS[shown].scale}</span></div>
           {extraHud}
         </>}
       >
@@ -287,7 +314,7 @@ export default function NanoDive({ lut, height = "min(70vh, 620px)", initial = 0
         {shown === 3 && <Lamellae />}
         {shown < 3 && <Sparkles count={60} scale={[12, 6, 12]} size={2} speed={0.2} opacity={0.5} color="#9fd2ff" />}
         <OrbitControls makeDefault enablePan={false} enableDamping autoRotate={shown < 3} autoRotateSpeed={0.35} maxPolarAngle={shown === 3 ? Math.PI * 0.62 : Math.PI * 0.49} />
-        <Rig level={shown} push={fade} />
+        <Rig level={shown} leaveKey={leaveKey} deeper={deeper} />
       </Stage3D>
       <div className="dive-bar">
         <div className="dive-levels" role="group" aria-label="Zoom level">
@@ -302,7 +329,7 @@ export default function NanoDive({ lut, height = "min(70vh, 620px)", initial = 0
           {touring ? <><Pause size={14} /> Stop the dive</> : <><Play size={14} /> Play the dive</>}
         </button>
       </div>
-      <p className="dive-text">{L.text}</p>
+      <p className="dive-text" key={"t" + level}>{L.text}</p>
     </div>
   );
 }

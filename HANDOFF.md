@@ -16,15 +16,15 @@ The models were inspired by the reference site dna-and-ga-lab.vercel.app (code a
 
 | Route | What it is | Main files |
 |---|---|---|
-| `/` | Hero 3D Morpho, the problem, chapter and playground cards, "one idea, five machines" table | `app/page.tsx`, `components/HeroMorpho.tsx`, `components/Thumb.tsx`, `app/home.css` |
-| `/structural-colour` | Ch1 (6 steps): 3D nano-dive, wave adder, stack tuner, 3D tilt cards, diffraction, structure-vs-pigment experiments | `app/structural-colour/Chapter1.tsx`, `components/ch1/*` |
-| `/anti-counterfeit` | Ch2 (6 steps): OECD chart, conventional features, 3D specimen note with KolourOptik-style stripe, microscope, UV/heat stress, cost and pros/cons | `components/ch2/*`, `components/three/Banknote.tsx` |
-| `/beyond` | Ch3 (5 steps): vapour rig diagram, thermal camera, 3D MorphoTex weave, 3D Mirasol IMOD, timeline and future demos | `components/ch3/*` |
-| `/wing-lab` | 3D butterfly sandbox plus the nano-dive | `app/wing-lab/WingLab.tsx` |
-| `/spot-the-fake` | 5-round 3D game (the deck's slide-2 activity) | `app/spot-the-fake/*` |
-| `/vapour-lab` | Vapour sensor with live PCA and a mystery vial | `app/vapour-lab/*` |
-| `/tag-forge` | Paint a latent-image tag, auto-design it, attack it with a printed copy | `app/tag-forge/TagForge.tsx` |
-| `/references` | Tabs (`#timeline`, `#sources`, `#slides`, `#team`) | `app/references/References.tsx` |
+| `/` | Hero 3D Morpho, chapter and playground cards, "one idea, three machines" table, Start the story | `app/page.tsx`, `components/StartStory.tsx` |
+| `/structural-colour` | Ch1 (6 steps): nano-dive, wave adder, stack tuner (no water: the scales are hydrophobic), tilt cards, diffraction, structure-vs-pigment | `app/structural-colour/Chapter1.tsx`, `components/ch1/*` |
+| `/anti-counterfeit` | Ch2 (3 steps, models only): 3D specimen note, microscope, cost model | `components/ch2/*`, `components/three/Banknote.tsx` |
+| `/beyond` | Ch3 (2 steps): vapour rig with sourced figures, 3D MorphoTex weave | `components/ch3/*` |
+| `/wing-lab` | 3D butterfly with eased camera glides and colour morphs, plus the nano-dive | `app/wing-lab/WingLab.tsx` |
+| `/vapour-lab` | Vapour sensor rebuilt on Kittle 2017/2020 and Potyrailo 2007/2013: P/P0 control, polarity gradient, Al2O3 coat toggle, PCA | `app/vapour-lab/*` |
+| `/references` | Tabs (`#photos`, `#sources`, `#slides`, `#team`); photos are Wikimedia Commons files in `public/photos` | `app/references/References.tsx` |
+
+Story mode (`S`, or "Story mode" in the top bar): full screen, one model per screen, a bottom dock with prev/next across pages, an "all models" panel and a 20-minute clock. The order lives in `STORY` in `lib/site.ts`; its step titles must match the `<Step title>` props. Every 3D stage also has its own full-screen button.
 
 Shared shell: `components/Shell.tsx` (top bar, Ctrl K palette, presenter mode, progress tracker) and `components/ui.tsx` (`Steps`/`Step`, `Notes`, `Range`, `Seg`, `Readouts`, `Plot`, `useRaf`, `useCanvas`, `Connects`). Site registry: `lib/site.ts`. Styles: `app/globals.css`, a single dark theme with tokens on `:root`.
 
@@ -40,7 +40,7 @@ Presenter features: `P` toggles `<Notes>` (Say / Show / Ask the class), `←` `�
 - Engineered designs in `lib/designs.ts`: `TAG_A` 120/480 N6 (magenta to teal), `TAG_B` 200/490 N6 (green to magenta). The Tag Forge pair is base 200/380 N6 against image +40 nm shelf and −60 nm gap: blue head-on, gold when tilted.
 - Mirasol pixel (`components/ch3/Mirasol.tsx`): glass n = 1.52 / Cr 6 nm (3.1+3.3i) / oxide 82 nm (n = 1.46) / air gap / Al (1.2+7i). Gap 0 is black; red 238 nm, blue 310 nm, green 390 nm.
 
-The vapour model (`app/vapour-lab/model.ts`) and the thermal model (`components/ch3/Thermal.tsx`) are **teaching models**: the refractive indices are real, and the other constants were tuned to reproduce the deck's figures (PCA about 93.5% of variance against the deck's 91.9–98.1%, 2–3 s recovery, 2.9 mK against 40 mK NETD). The UI says so.
+The vapour model (`app/vapour-lab/model.ts`) is a **teaching model**. Its vapours, 0.15–0.50 P/P0 range, vapour pressures, refractive indices and mechanism (capillary condensation, polar tops and less-polar bottoms, Al2O3 coat removes selectivity) come from the papers listed in References; uptake constants, depth preferences and swelling are tuned. The deck's "2–3 s recovery" and "70–90 s" figures were dropped because no source supported them. The UI says so.
 
 ## 3D building blocks (`components/three/`, `lib/scene/materials.ts`)
 

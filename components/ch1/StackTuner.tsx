@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import * as O from "@/lib/optics";
 import { Plot, Range, Readouts, Seg, Swatch, useCanvas } from "../ui";
 
-type Fill = "air" | "water" | "ethanol" | "ipa";
+type Fill = "air" | "ethanol" | "ipa"; // no water: the scales are hydrophobic, so drops bead up and roll off
 interface P { dc: number; da: number; N: number; fill: Fill; th: number }
 
 const PRESETS: { name: string; note: string; p: P }[] = [
@@ -74,7 +74,7 @@ export default function StackTuner() {
           <Range label="Number of shelves" value={p.N} min={1} max={14} onChange={set("N")} />
           <Range label="Viewing angle" value={p.th} min={0} max={70} onChange={set("th")} fmt={(v) => v + "°"} />
           <div className="ctrl"><span className="lbl"><span>What fills the gaps</span><span className="val">n = {nf.toFixed(3)}</span></span>
-            <Seg label="Gap fill" value={p.fill} onChange={set("fill") as (v: Fill) => void} options={[["air", "Air"], ["water", "Water"], ["ethanol", "Ethanol"], ["ipa", "Isopropanol"]]} />
+            <Seg label="Gap fill" value={p.fill} onChange={set("fill") as (v: Fill) => void} options={[["air", "Air"], ["ethanol", "Ethanol"], ["ipa", "Isopropanol"]]} />
           </div>
         </div>
       </div>
